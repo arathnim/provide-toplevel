@@ -1,7 +1,5 @@
 (proclaim '(optimize (speed 0) (safety 3) (debug 3)))
 
-(ql:quickload '(alexandria iterate anaphora) :silent t)
-
 (defpackage provide-toplevel
   (:export add-hook)
   (:use cl))
