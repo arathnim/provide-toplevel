@@ -14,6 +14,8 @@
 (defun add-hook (function)
    (push function *toplevel-hooks*))
 
+;; add hook for swank on eval-region form variable
+
 ;; repl hook
 
 (defun repl-read-form (in out)
@@ -81,3 +83,19 @@ starting at line ~D, column ~D~%  of ~S:"
                    (eval-form form nil))))))))
    t))
 
+(when (find-package 'swank) 
+      (in-package swank)
+      (defun swank::eval-region (string)
+      "Evaluate STRING.
+      Return the results of the last form as a list and as secondary value the 
+      last form."
+       (with-input-from-string (stream string)
+         (let (- values)
+           (loop
+              (let ((form (provide-toplevel::apply-hooks (read stream nil stream))))
+                (when (eq form stream)
+                  (finish-output)
+                  (return (values values -)))
+                (setq - form)
+                (setq values (multiple-value-list (eval form)))
+                (finish-output)))))))
